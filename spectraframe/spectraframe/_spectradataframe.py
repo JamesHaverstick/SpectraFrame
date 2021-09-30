@@ -1,47 +1,88 @@
+"""
+Define SpectraDataFrame class
+"""
 import pandas as pd
 import numpy as np
 from scipy import integrate
-from dataframe_functions import normalize_to_range
+from typing import Union
+from _dataframe_functions import normalize_to_range
 
 
 class SpectraDataFrame:
     def __init__(self,
-                 df: pd.DataFrame,
+                 data: Union[pd.DataFrame, dict],
                  xname=None):
+        """
+        Returns Constructs SpectraDataFrame
+        :param data: pandas DataFrame or dict
+        :param xname: name of column or key containing x-values. By default this is the first column.
+        """
+        if type(data) is dict:  # Make sure data is a DataFrame
+            data = pd.DataFrame(data)
         if xname is None:
-            self.xname = df.columns[0]
+            self.xname = data.columns[0]
         else:
             self.xname = xname
-        self.df = df
+        self.df = data
+        self._index = -1
         self.x = None
+        self.specnames = None
         self._update()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        self._index += 1
+        if self._index >= len(self.specnames):
+            self._index = -1
+            raise StopIteration
+        else:
+            return self.spectra()[self.specnames[self._index]]
 
     def __getitem__(self, key):
         """Return series of column with given column name."""
         return self.df[key]
 
     def __contains__(self, item):
-        return item in self.specnames()
+        """Checks if item is a name of any spectra column."""
+        return item in self.specnames
 
-    def _update(self):  # after changing some aspect of df
+    def _update(self):
+        """Update attributes after changing some aspect of self.df."""
         self.x = np.array(self.df[self.xname])
 
         if self.x[0] > self.x[1]:  # if x axis is decreasing
             self.df = self.df.iloc[::-1]  # reverse order
             self.x = np.array(self.df[self.xname])  # reset self.x
+            self.specnames = self.spectra().columns
 
-    def crop(self, x1, x2):
-        self.df = self.df[self.df[self.xname] < x2]
-        self.df = self.df[self.df[self.xname] > x1]
-        self._update()
+    def crop(self, x1, x2, inplace=True):
+        """
+        Crops data to range [x1,x2]. (Inclusive range)
+        :param x1: x-value for lower bound.
+        :param x2: x-value for upper bound.
+        :param inplace: if False, returns new SpectraDataFrame without affecting current instance.
+        :return: None or SpectraDataFrame
+        """
+        if x1 >= x2:
+            raise ValueError('x2 must be greater than x1')
+        if x1 >= self.x[-1]:
+            raise ValueError('x1 is out of range.')
+        if x2 <= self.x[0]:
+            raise ValueError('x2 is out of range')
+        if inplace:
+            self.df = self.df[self.df[self.xname] <= x2]
+            self.df = self.df[self.df[self.xname] >= x1]
+            self._update()
+        else:
+            new_df = self.df[self.df[self.xname] <= x2]
+            new_df = new_df[new_df[self.xname] >= x1]
+            return SpectraDataFrame(new_df)
 
     def spectra(self):
         """Returns DataFrame with x-axis dropped."""
         return self.df.drop([self.xname], axis=1)
-
-    def specnames(self):
-        """Returns names of spectra (column names)"""
-        return self.spectra().columns
 
     def mean(self):
         """Returns average spectrum."""
@@ -56,10 +97,15 @@ class SpectraDataFrame:
         return np.array(self.spectra().sem(axis=1))
 
     def normalize_by_area(self, zero=True, area=None):
-        """Normalizes all spectra to the same area."""
+        """
+        Normalizes all spectra to the same area.
+        :param zero: If True, spectra are shifted before scaling.
+        :param area: Final wanted area. (Calculated using trapezoidal method)
+        :return:
+        """
         if area is None:
             area = 1
-        for col in self.specnames():
+        for col in self.specnames:
             spectra = np.array(self.df[col])
             if zero:
                 spectra = spectra - np.min(spectra)
@@ -73,5 +119,5 @@ class SpectraDataFrame:
         else:
             if value_range[0] > value_range[1]:
                 raise ValueError('The first element of value_range should be less than the second element.')
-        for col in self.specnames():
+        for col in self.specnames:
             self.df[col] = normalize_to_range(self.df[col], value_range)
