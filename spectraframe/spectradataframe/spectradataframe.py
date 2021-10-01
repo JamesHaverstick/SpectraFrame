@@ -27,6 +27,7 @@ class SpectraDataFrame:
         self._index = -1
         self.x = None
         self.specnames = None
+        self._are_ints_in_names = False
         self._update()
 
     def __iter__(self):
@@ -42,7 +43,11 @@ class SpectraDataFrame:
 
     def __getitem__(self, key):
         """Return series of column with given column name."""
-        return self.df[key]
+        if type[key] is int:
+            try:
+                return self.df[key]
+            except KeyError:
+                return self.df[self.specnames[key]]
 
     def __contains__(self, item):
         """Checks if item is a name of any spectra column."""
@@ -56,16 +61,35 @@ class SpectraDataFrame:
             self.df = self.df.iloc[::-1]  # reverse order
         self.x = np.array(self.df[self.xname])  # reset self.x
         self.specnames = self.spectra().columns
+        self._are_ints_in_names = False
 
     def to_csv(self, path, sep=None, header=True):
+        """
+        Save data as a text file.
+        :param path: Path to save data.
+        :param sep: Separator to use. (Default ',')
+        :param header: Whether to include column names.
+        :return: None
+        """
         if sep is None:
             sep = ','
         self.df.to_csv(path, sep=sep, header=header, index=False)
 
     def to_tsv(self, path, sep=None, header=True):
+        """
+        Save data as a text file.
+        :param path: Path to save data.
+        :param sep: Separator to use. (Default '\t')
+        :param header: Whether to include column names.
+        :return: None
+        """
         if sep is None:
             sep = '\t'
         self.df.to_csv(path, sep=sep, header=header, index=False)
+
+    def copy(self):
+        """Return a copy of SpectraDataFrame object."""
+        return SpectraDataFrame(self.df)
 
     def apply_function(self, func, inplace=True):
         """
