@@ -57,6 +57,24 @@ class SpectraDataFrame:
             self.x = np.array(self.df[self.xname])  # reset self.x
             self.specnames = self.spectra().columns
 
+    def apply_function(self, func, inplace=True):
+        """
+        Applies a function to all spectra.
+        function arguments:
+            numpy array with x-values.
+            pandas series with spectra values.
+        function returns:
+            array-like replacement spectra, should be same length as input
+        """
+        new_df = pd.DataFrame(data={self.xname: self.x})
+        for col in self.specnames:
+            new_df[col] = func(self.x, self[col])
+        if inplace:
+            self.df = new_df
+            self._update()
+        else:
+            return SpectraDataFrame(new_df)
+
     def crop(self, x1, x2, inplace=True):
         """
         Crops data to range [x1,x2]. (Inclusive range)
