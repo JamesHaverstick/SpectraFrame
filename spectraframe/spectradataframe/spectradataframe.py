@@ -57,6 +57,16 @@ class SpectraDataFrame:
         self.x = np.array(self.df[self.xname])  # reset self.x
         self.specnames = self.spectra().columns
 
+    def to_csv(self, path, sep=None, header=True):
+        if sep is None:
+            sep = ','
+        self.df.to_csv(path, sep=sep, header=header, index=False)
+
+    def to_tsv(self, path, sep=None, header=True):
+        if sep is None:
+            sep = '\t'
+        self.df.to_csv(path, sep=sep, header=header, index=False)
+
     def apply_function(self, func, inplace=True):
         """
         Applies a function to all spectra.
