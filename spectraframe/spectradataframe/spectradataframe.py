@@ -80,7 +80,7 @@ class SpectraDataFrame:
         Crops data to range [x1,x2]. (Inclusive range)
         :param x1: x-value for lower bound.
         :param x2: x-value for upper bound.
-        :param inplace: if False, returns new SpectraDataFrame without affecting current instance.
+        :param inplace: Perform operation in-place or return a new instance.
         :return: None or SpectraDataFrame
         """
         if x1 >= x2:
@@ -114,11 +114,12 @@ class SpectraDataFrame:
         """Return standard error at each measurement point."""
         return np.array(self.spectra().sem(axis=1))
 
-    def normalize_by_area(self, zero=True, area=None):
+    def normalize_by_area(self, zero=True, area=None, inplace=True):
         """
         Normalizes all spectra to the same area.
         :param zero: If True, spectra are shifted before scaling.
         :param area: Final wanted area. (Calculated using trapezoidal method)
+        :param inplace: Perform operation in-place or return a new instance.
         :return:
         """
         if area is None:
