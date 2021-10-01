@@ -42,12 +42,18 @@ class SpectraDataFrame:
             return self.spectra()[self.specnames[self._index]]
 
     def __getitem__(self, key):
-        """Return series of column with given column name."""
-        if type[key] is int:
-            try:
-                return self.df[key]
-            except KeyError:
+        """Return series of column with given column name or index."""
+        if type(key) is int:
+            if self._are_ints_in_names:
+                try:
+                    return self.df[key]
+                except KeyError:
+                    raise KeyError(f'{key} not found. Selecting by index is\
+                     disabled when spectra have integer names')
+            else:
                 return self.df[self.specnames[key]]
+        else:
+            return self.df[key]
 
     def __contains__(self, item):
         """Checks if item is a name of any spectra column."""
@@ -62,6 +68,11 @@ class SpectraDataFrame:
         self.x = np.array(self.df[self.xname])  # reset self.x
         self.specnames = self.spectra().columns
         self._are_ints_in_names = False
+        for name in self.specnames:
+            if type(name) == int:
+                self._are_ints_in_names = True
+                break
+
 
     def to_csv(self, path, sep=None, header=True):
         """
