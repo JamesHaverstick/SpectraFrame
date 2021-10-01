@@ -1,2 +1,2 @@
-from spectradataframe.spectradataframe import SpectraDataFrame
-from plotting.plottingtools import plot
+from .spectradataframe.spectradataframe import SpectraDataFrame
+from .plotting.plottingtools import plot

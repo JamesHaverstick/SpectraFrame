@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from scipy import integrate
 from typing import Union
-from _dataframe_functions import normalize_to_range
+from ._dataframe_functions import normalize_to_range
 
 
 class SpectraDataFrame:
@@ -54,8 +54,8 @@ class SpectraDataFrame:
 
         if self.x[0] > self.x[1]:  # if x axis is decreasing
             self.df = self.df.iloc[::-1]  # reverse order
-            self.x = np.array(self.df[self.xname])  # reset self.x
-            self.specnames = self.spectra().columns
+        self.x = np.array(self.df[self.xname])  # reset self.x
+        self.specnames = self.spectra().columns
 
     def apply_function(self, func, inplace=True):
         """
