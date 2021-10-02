@@ -65,7 +65,6 @@ class SpectraDataFrame:
                 self._are_ints_in_names = True
                 break
 
-
     def to_csv(self, path, sep=None, header=True):
         """
         Save data as a text file.
@@ -93,6 +92,23 @@ class SpectraDataFrame:
     def copy(self):
         """Return a copy of SpectraDataFrame object."""
         return SpectraDataFrame(self.df)
+
+    def remove(self, names):
+        """
+        Remove spectra in place.
+        :param names: List of column names to remove.
+        :return: None
+        """
+        self.df = self.df.drop(names, axis=1)
+        self._update()
+
+    def drop(self, names):
+        """
+        Returns a SpectraDataFrame with removed columns.
+        :param names: List of column names to remove.
+        :return: SpectraDataFrame
+        """
+        return SpectraDataFrame(self.df.drop(names, axis=1))
 
     def apply_function(self, func, inplace=True):
         """
