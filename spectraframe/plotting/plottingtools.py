@@ -31,7 +31,7 @@ def plot(sdf: SpectraDataFrame,
     ax = plt.subplot()
     x = sdf.x
     spectra = sdf.spectra()
-    for col in sdf.specnames:
+    for col in sdf.names:
         ax.plot(x, spectra[col], lw=linewidth, label='')
     if plot_average:
         ax.plot(x, sdf.mean(), lw=1, color='red', zorder=200, label='Avg')

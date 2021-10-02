@@ -26,12 +26,12 @@ class SpectraDataFrame:
         self.df = data
         self._index = -1
         self.x = None
-        self.specnames = None
+        self.names = None
         self._are_ints_in_names = False
         self._update()
 
     def __iter__(self):
-        return iter(self.specnames)
+        return iter(self.names)
 
     def __getitem__(self, key):
         """Return series of column with given column name or index."""
@@ -43,13 +43,13 @@ class SpectraDataFrame:
                     raise KeyError(f'{key} not found. Selecting by index is\
                      disabled when spectra have integer names')
             else:
-                return self.df[self.specnames[key]]
+                return self.df[self.names[key]]
         else:
             return self.df[key]
 
     def __contains__(self, item):
         """Checks if item is a name of any spectra column."""
-        return item in self.specnames
+        return item in self.names
 
     def _update(self):
         """Update attributes after changing some aspect of self.df."""
@@ -58,9 +58,9 @@ class SpectraDataFrame:
         if self.x[0] > self.x[1]:  # if x axis is decreasing
             self.df = self.df.iloc[::-1]  # reverse order
         self.x = np.array(self.df[self.xname])  # reset self.x
-        self.specnames = self.spectra().columns
+        self.names = self.spectra().columns
         self._are_ints_in_names = False
-        for name in self.specnames:
+        for name in self.names:
             if type(name) == int:
                 self._are_ints_in_names = True
                 break
@@ -120,7 +120,7 @@ class SpectraDataFrame:
             array-like replacement spectra, should be same length as input
         """
         new_df = pd.DataFrame(data={self.xname: self.x})
-        for col in self.specnames:
+        for col in self.names:
             new_df[col] = func(self.x, self[col])
         if inplace:
             self.df = new_df
@@ -177,7 +177,7 @@ class SpectraDataFrame:
         """
         if area is None:
             area = 1
-        for col in self.specnames:
+        for col in self.names:
             spectra = np.array(self.df[col])
             if zero:
                 spectra = spectra - np.min(spectra)
@@ -191,5 +191,5 @@ class SpectraDataFrame:
         else:
             if value_range[0] > value_range[1]:
                 raise ValueError('The first element of value_range should be less than the second element.')
-        for col in self.specnames:
+        for col in self.names:
             self.df[col] = normalize_to_range(self.df[col], value_range)
