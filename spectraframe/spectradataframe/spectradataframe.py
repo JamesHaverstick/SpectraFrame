@@ -31,15 +31,7 @@ class SpectraDataFrame:
         self._update()
 
     def __iter__(self):
-        return self
-
-    def __next__(self):
-        self._index += 1
-        if self._index >= len(self.specnames):
-            self._index = -1
-            raise StopIteration
-        else:
-            return self.spectra()[self.specnames[self._index]]
+        return iter(self.specnames)
 
     def __getitem__(self, key):
         """Return series of column with given column name or index."""
