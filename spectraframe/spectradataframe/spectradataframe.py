@@ -47,6 +47,14 @@ class SpectraDataFrame:
         else:
             return self.df[key]
 
+    def __setitem__(self, key, value):
+        """Adds or changes spectra"""
+        if key == self.xname:
+            raise KeyError('Key is name of x-axis. Cannot change contents of x-axis this way.')
+        else:
+            self.df[key] = value
+            self._update()
+
     def __contains__(self, item):
         """Checks if item is a name of any spectra column."""
         return item in self.names
@@ -91,7 +99,7 @@ class SpectraDataFrame:
 
     def copy(self):
         """Return a copy of SpectraDataFrame object."""
-        return SpectraDataFrame(self.df)
+        return SpectraDataFrame(self.df.copy(deep=True))
 
     def remove(self, names):
         """
