@@ -5,5 +5,5 @@ setup(
     name='spectraframe',
     version='0.1dev',
     packages=['spectraframe'],
-    license='MIT License'
+    license='MIT License',
 )
