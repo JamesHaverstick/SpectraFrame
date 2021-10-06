@@ -14,13 +14,13 @@ Typical usage looks like this::
 
     spectra = sf.read_csv(path)
 
-    spectra.crop(400, 2500, inplace=True)
+    spectra.crop(400, 2500)
 
     sf.plot(spectra, with_average=True)
 
 
 
-This package is still under heavy development. Here are some other python packages that also focus
+This package is still under development. Here are some other python packages that also focus
 on working with spectroscopic data.
 If you need a package for python 2 that supports more advanced plotting, check
 out Scikitspectra. There is also specutils which is designed for astronomical spectroscopic data.
