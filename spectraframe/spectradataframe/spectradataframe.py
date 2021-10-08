@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from scipy import integrate
 from typing import Union
-from ._dataframe_functions import normalize_to_range
+from ._dataframe_functions import normalize_to_range, bound_errors
 
 
 class SpectraDataFrame:
@@ -144,12 +144,7 @@ class SpectraDataFrame:
         :param inplace: Perform operation in-place or return a new instance.
         :return: None or SpectraDataFrame
         """
-        if x1 >= x2:
-            raise ValueError('x2 must be greater than x1')
-        if x1 >= self.x[-1]:
-            raise ValueError('x1 is out of range.')
-        if x2 <= self.x[0]:
-            raise ValueError('x2 is out of range')
+        bound_errors(self.x, x1, x2)
         if inplace:
             self.df = self.df[self.df[self.xname] <= x2]
             self.df = self.df[self.df[self.xname] >= x1]
@@ -157,6 +152,15 @@ class SpectraDataFrame:
         else:
             new_df = self.df[self.df[self.xname] <= x2]
             new_df = new_df[new_df[self.xname] >= x1]
+            return SpectraDataFrame(new_df)
+
+    def remove_region(self, x1, x2, inplace=True):
+        bound_errors(self.x, x1, x2)
+        if inplace:
+            self.df = self.df[self.df[self.xname] <= x1 or self.df[self.xname] >= x2]
+            self._update()
+        else:
+            new_df = self.df[self.df[self.xname] <= x1 or self.df[self.xname] >= x2]
             return SpectraDataFrame(new_df)
 
     def spectra(self):
