@@ -179,29 +179,38 @@ class SpectraDataFrame:
         """Return standard error at each measurement point."""
         return np.array(self.spectra().sem(axis=1))
 
-    def normalize_by_area(self, zero=True, area=None, inplace=True):
+    def normalize(self, method='default', params=None):
         """
-        Normalizes all spectra to the same area.
-        :param zero: If True, spectra are shifted before scaling.
-        :param area: Final wanted area. (Calculated using trapezoidal method)
-        :param inplace: Perform operation in-place or return a new instance.
-        :return:
+        Normalize the spectra by various methods.
+        :param method: str of method to use
+        :param params: various params to apply
+        :return: None
         """
-        if area is None:
-            area = 1
-        for col in self.names:
-            spectra = np.array(self.df[col])
-            if zero:
-                spectra = spectra - np.min(spectra)
-            self.df[col] = area * spectra * \
-                (1 / integrate.cumtrapz(spectra, self.x, initial=0)[-1])
-
-    def normalize(self, value_range=None):
-        """Normalizes spectra between two values. (default: 0,1)"""
-        if value_range is None:
-            value_range = (0, 1)
-        else:
+        if params is None:
+            params = {}
+        if method in ['default', 'Default']:
+            value_range = params['range'] if 'range' in params else (0, 1)
             if value_range[0] > value_range[1]:
                 raise ValueError('The first element of value_range should be less than the second element.')
-        for col in self.names:
-            self.df[col] = normalize_to_range(self.df[col], value_range)
+            for col in self.names:
+                self.df[col] = normalize_to_range(self.df[col], value_range)
+        elif method in ['area', 'Area']:
+            area = params['area'] if 'area' in params else 1
+            zero = params['zero'] if 'zero' in params else True
+            for col in self.names:
+                spectra = np.array(self.df[col])
+                if zero:
+                    spectra = spectra - np.min(spectra)
+                self.df[col] = area * spectra * \
+                    (1 / integrate.cumtrapz(spectra, self.x, initial=0)[-1])
+        elif method in ['mean', 'Mean',
+                        'average', 'Average']:
+            mean = params['mean'] if 'mean' in params else 1
+            zero = params['zero'] if 'zero' in params else True
+            for col in self.names:
+                spectra = np.array(self.df[col])
+                if zero:
+                    spectra = spectra - np.min(spectra)
+                self.df[col] = spectra * (mean / np.mean(spectra))
+
+
