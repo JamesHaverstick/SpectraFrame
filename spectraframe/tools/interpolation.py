@@ -14,5 +14,5 @@ def interpolate(sdf: SpectraDataFrame, new_x):
     data = {sdf.xname: new_x}
     for col in sdf.names:
         func = interp1d(sdf.x, sdf[col])
-        data[col] = np.frominter(map(func, new_x), float)
+        data[col] = np.fromiter(map(func, new_x), float)
     return SpectraDataFrame(pd.DataFrame(data))
