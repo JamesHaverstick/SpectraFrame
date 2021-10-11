@@ -157,10 +157,10 @@ class SpectraDataFrame:
     def remove_region(self, x1, x2, inplace=True):
         bound_errors(self.x, x1, x2)
         if inplace:
-            self.df = self.df[self.df[self.xname] <= x1 or self.df[self.xname] >= x2]
+            self.df = self.df[[False if x1 < i < x2 else True for i in self.x]]
             self._update()
         else:
-            new_df = self.df[self.df[self.xname] <= x1 or self.df[self.xname] >= x2]
+            new_df = self.df[[False if x1 < i < x2 else True for i in self.x]]
             return SpectraDataFrame(new_df)
 
     def spectra(self):
