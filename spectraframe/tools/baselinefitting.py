@@ -5,8 +5,8 @@ import numpy as np
 
 
 def fit_baseline(sdf, func, regions=None, p0=None, bounds=(-np.inf, np.inf)):
-    baseline_data = {}
-    corrected_data = {}
+    baseline_data = {sdf.xname: sdf.x}
+    corrected_data = {sdf.xname: sdf.x}
     params = {}
     sdfcopy = sdf.copy()
     if regions is not None:
