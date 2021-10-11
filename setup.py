@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(
     name='spectraframe',
-    version='0.2.1',
+    version='v0.3.0',
     packages=['spectraframe',
               'spectraframe.spectradataframe',
               'spectraframe.plotting',
