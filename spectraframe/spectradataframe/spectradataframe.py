@@ -62,7 +62,8 @@ class SpectraDataFrame:
     def _update(self):
         """Update attributes after changing some aspect of self.df."""
         self.x = np.array(self.df[self.xname])
-
+        if self.df.isnull().values.any():
+            raise Warning('Some values of SpectraDataFrame are NaN.')
         if self.x[0] > self.x[1]:  # if x axis is decreasing
             self.df = self.df.iloc[::-1]  # reverse order
         self.x = np.array(self.df[self.xname])  # reset self.x
