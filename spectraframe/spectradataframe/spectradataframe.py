@@ -197,7 +197,7 @@ class SpectraDataFrame:
                 self.df[col] = normalize_to_range(self.df[col], value_range)
         elif method in ['area', 'Area']:
             area = params['area'] if 'area' in params else 1
-            zero = params['zero'] if 'zero' in params else True
+            zero = params['zero'] if 'zero' in params else False
             for col in self.names:
                 spectra = np.array(self.df[col])
                 if zero:
@@ -207,7 +207,7 @@ class SpectraDataFrame:
         elif method in ['mean', 'Mean',
                         'average', 'Average']:
             mean = params['mean'] if 'mean' in params else 1
-            zero = params['zero'] if 'zero' in params else True
+            zero = params['zero'] if 'zero' in params else False
             for col in self.names:
                 spectra = np.array(self.df[col])
                 if zero:
