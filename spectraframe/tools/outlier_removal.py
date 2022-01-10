@@ -32,3 +32,8 @@ def pick_outliers(sdf, N, region=None, method='max'):
     sortedspectra = [x for _, x in sorted(zip(values, sdf.names))]
     sortedspectra.reverse()
     return sortedspectra[:N]
+
+
+def remove_nan(sdf):
+    pass
+    # TODO: Build this function
